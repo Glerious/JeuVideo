@@ -1,7 +1,9 @@
 import pygame
 from functools import wraps
 from modules.player_properties import *
-from modules.window_properties import *
+
+FRAME_FOR_JUMP = 500
+STATIC_SPRITE_TIME = 200
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, frame_path: str) -> None:

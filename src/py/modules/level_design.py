@@ -1,5 +1,5 @@
 import pygame
-from modules.window_properties import *
+from modules.window import HEIGHT, WIDTH
 
 class Ground(pygame.sprite.Sprite):
     def __init__(self) -> None:

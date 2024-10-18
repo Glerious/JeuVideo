@@ -1,12 +1,14 @@
 from modules.window import *
 from modules.background import BackGround
 from modules.player import Player
-from modules.window_properties import *
 from modules.level_design import Block, LevelBlocks
 
 import sys
+from json import load
 
-window = Window("Nothing", WIDTH, HEIGHT)
+config = load("../../ressources/config.json")
+
+window = Window("Nothing", config[], HEIGHT)
 
 window.start()
 

@@ -1,12 +1,14 @@
 import pygame
 
+HEIGHT = 765
+WIDTH = 1360
+
 class Window:
     def __init__(self, name : str, width : float, height : float, fps : float = 60) -> None:
         self.is_running : bool = True
         self.screen : pygame.Surface = self.window_generator(name, width, height)
         self.clock = pygame.time.Clock()
         self.fps = 60
-
 
     def start(self):
         self.is_running = True
