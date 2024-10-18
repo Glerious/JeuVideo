@@ -16,12 +16,11 @@ class Server:
         data = json_file.read()
         return loads(data)
 
-
 class GameSession:
     def __init__(self) -> None:
         self.server = Server()
         self.background = BackGround(self.server.config)
-        self.player = Player("../../ressources/characters/player/")
+        self.player = Player(self.server.config)
         self.level_blocks = LevelBlocks()
         self.key_pressed = {}
         self.gravity_value = 10

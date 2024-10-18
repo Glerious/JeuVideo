@@ -9,51 +9,50 @@ STATIC_SPRITE_TIME = 200
 class Player(GameClass, pygame.sprite.Sprite):
     def __init__(self, config: dict) -> None:
         super(self).__init__(config, "player")
-        # Statistic
         statistics_config = self.config["statistics"]
+        # Statistic
         self.max_health: int = statistics_config["health"]
-        self.health: int = self.max_health
+        self._health: int = self.max_health
         self.max_speed: int = statistics_config["speed"]
-        self.speed: int = self.max_speed
-        self.mass: int = 65
-        # Dynamics informations
-        self.dash : bool = True
-        # Passiv informations
-        self.static_animation = StaticAnimation(self, pygame.time.get_ticks())
-        self.jump = Jump(self)
-        self.is_static : bool = True
+        self._speed: int = self.max_speed
+        self._mass: int = 65
+        # Dynamic informations
+        self._static: Static = Static(self, pygame.time.get_ticks())
+        self._jump: Jump
+        self._dash: Dash
         self.is_left : bool = False
-        self.is_jumping : bool = False
-        self.is_dashing : bool = False
         # Display
-        self.frame_number = 0
-        self.frame = pygame.image.load(self.get_path()).convert_alpha()
-        self.rect = self.frame.get_rect()
+        self.sprite: pygame.Surface
+        self.next_frame: pygame.Surface = pygame.image.load(self.statics.get_path()).convert_alpha()
+        self.rect = self.sprite.get_rect()
         self.set_position(40, 0)
+        self.sprite_update()
 
-    def frame_update(self):
-        self.frame.fill((0, 0, 0, 0))
-        self.next_frame()
-        self.frame = pygame.image.load(self.get_path()).convert_alpha()
+    @property
+    def static(self):
+        return self._static
+    
+    @static.setter
+    def setstatic(self):
+        self._static = Static(self, pygame.time.get_ticks())
 
-    def get_path(self) -> str:
-        path = self.frame_path
-        if self.is_static:
-            path += "static_" + str(self.frame_number) + "_"
-        path += "l" if self.is_left else "r"
-        path += ".png"
-        return path
+    @static.deleter
+    def delstatic(self):
+        del self._static
 
-    def next_frame(self) -> None:
-        if self.is_static:
-            self.frame_number = 0 if self.frame_number == 2 else self.frame_number + 1
-
-
-    #TODO coder un déplacement vectoriel ayant pour norme la vitesse et sa direction ?
     def set_position(self, x : int, y : int) -> None:
         self.rect.x = x
         self.rect.y = y
 
+    def sprite_update(self):
+        self.sprite.fill((0, 0, 0, 0))
+        self.sprite = self.next_frame
+        self.next_frame = 
+        self.sprite = pygame.image.load(self.get_path()).convert_alpha()
+
+
+    
+    #TODO coder un déplacement vectoriel ayant pour norme la vitesse et sa direction ?
     def move_left(self):
         if self.rect.x <= 0:
             return
@@ -93,7 +92,7 @@ class PlayerAnimation(GameClass):
     def setplayer(self, player: Player):
         self._player = player
     
-class StaticAnimation(PlayerAnimation):
+class Static(PlayerAnimation):
     def __init__(self, player: Player, time : int) -> None:
         super(self).__init__(player, "static")
         self.begin = time
@@ -104,6 +103,19 @@ class StaticAnimation(PlayerAnimation):
         if now - self.begin >= self.cooldown:
             self.begin = now
             self.player.frame_update()
+
+
+    def get_path(self) -> str:
+        path = self.frame_path
+        if self.is_static:
+            path += "static_" + str(self.frame_number) + "_"
+        path += "l" if self.is_left else "r"
+        path += ".png"
+        return path
+
+    def next_frame(self) -> None:
+        if self.is_static:
+            self.frame_number = 0 if self.frame_number == 2 else self.frame_number + 1
 
 class Jump():
     def __init__(self, player : Player) -> None:
@@ -138,3 +150,6 @@ class Jump():
         self.last_elevation = y
         if y >= 0:
             self.stop()
+
+class Dash:
+    pass
