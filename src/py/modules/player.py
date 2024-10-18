@@ -17,41 +17,31 @@ class Player(GameClass, pygame.sprite.Sprite):
         self._speed: int = self.max_speed
         self._mass: int = 65
         # Dynamic informations
-        self._static: Static = Static(self, pygame.time.get_ticks())
-        self._jump: Jump
-        self._dash: Dash
+        self.static: Static = Static(self)
+        self.jump: Jump = Jump(self)
+        self.dash: Dash = Dash(self)
         self.is_left : bool = False
         # Display
-        self.sprite: pygame.Surface
-        self.next_frame: pygame.Surface = pygame.image.load(self.statics.get_path()).convert_alpha()
+        self.sprite: pygame.Surface = pygame.image.load(self.static.getpath()).convert_alpha()
         self.rect = self.sprite.get_rect()
         self.set_position(40, 0)
-        self.sprite_update()
-
-    @property
-    def static(self):
-        return self._static
     
-    @static.setter
-    def setstatic(self):
-        self._static = Static(self, pygame.time.get_ticks())
-
-    @static.deleter
-    def delstatic(self):
-        del self._static
-
     def set_position(self, x : int, y : int) -> None:
         self.rect.x = x
         self.rect.y = y
 
     def sprite_update(self):
         self.sprite.fill((0, 0, 0, 0))
-        self.sprite = self.next_frame
-        self.next_frame = 
-        self.sprite = pygame.image.load(self.get_path()).convert_alpha()
+        path: str
+        if self.dash.isactive: 
+            path = self.dash.getpath()
+        if self.jump.isactive: 
+            path = self.jump.getpath()
+        else: 
+            path = self.static.getpath()
+            self.static.next()
+        self.sprite = pygame.image.load(path).convert_alpha()
 
-
-    
     #TODO coder un déplacement vectoriel ayant pour norme la vitesse et sa direction ?
     def move_left(self):
         if self.rect.x <= 0:
@@ -74,15 +64,13 @@ class Player(GameClass, pygame.sprite.Sprite):
         if self.rect.y >= HEIGHT:
             return
         self.rect.y += self.speed
-
-    def dash(self):
-        return
     
 
 class PlayerAnimation(GameClass):
     def __init__(self, player: Player, name: str) -> None:
         super(self).__init__(player.config, name)
         self._player: Player = player
+        self._active: bool = False
 
     @property
     def player(self):
@@ -91,34 +79,42 @@ class PlayerAnimation(GameClass):
     @player.setter
     def setplayer(self, player: Player):
         self._player = player
+
+    @property
+    def isactive(self):
+        return self._active
+    
+    @isactive.setter
+    def switchactive(self):
+        self._active = False if self._active else False
+
+    def getpath(self) -> str:
+        pass
     
 class Static(PlayerAnimation):
-    def __init__(self, player: Player, time : int) -> None:
+    def __init__(self, player: Player) -> None:
         super(self).__init__(player, "static")
-        self.begin = time
-        self.frame = self.player.config["frame"]
+        self.switchactive()
+        self.number: int = 0
+        self.begin: int = pygame.time.get_ticks()
+        self.frame: int = self.config["frame"]
 
-    def next(self):
-        now = pygame.time.get_ticks()
-        if now - self.begin >= self.cooldown:
-            self.begin = now
-            self.player.frame_update()
+    def next(self) -> int:
+        if pygame.time.get_ticks() - self.begin() :
+            return self.number
+        self.begin = pygame.time.get_ticks()
+        return 0 if self.number == 2 else self.number + 1
 
-
-    def get_path(self) -> str:
-        path = self.frame_path
-        if self.is_static:
-            path += "static_" + str(self.frame_number) + "_"
-        path += "l" if self.is_left else "r"
+    def getpath(self) -> str:
+        path = self.player.config["path"]
+        path += "left" if self.player.is_left else "right"
+        path += str(self.number)
         path += ".png"
         return path
 
-    def next_frame(self) -> None:
-        if self.is_static:
-            self.frame_number = 0 if self.frame_number == 2 else self.frame_number + 1
-
-class Jump():
+class Jump(PlayerAnimation):
     def __init__(self, player : Player) -> None:
+        super(self).__init__(player, "jump")
         self.player = player
         self.begin : int
         self.function = lambda x : (self.player.max_height / (self.frame_number / 2 ) ** 2) * x ** 2 - self.player.max_height
@@ -151,5 +147,6 @@ class Jump():
         if y >= 0:
             self.stop()
 
-class Dash:
-    pass
+class Dash(PlayerAnimation):
+    def __init__(self, player : Player):
+        super().__init__(player, "dash")

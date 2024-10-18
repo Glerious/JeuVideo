@@ -30,9 +30,9 @@ class GameSession:
         while self.window.is_running:
 
             #ScreenUpdater
-            window.set_image(self.background.image, (0, 0))
-            window.set_image(self.player.frame, self.player.rect)
-            self.level_blocks.printed(window.screen)
+            self.server.window.set_image(self.background.image, (0, 0))
+            self.server.window.set_image(self.player.sprite, self.player.rect)
+            self.level_blocks.printed(self.server.window.screen)
             pygame.display.update()
 
             #KeyPress
@@ -56,7 +56,7 @@ class GameSession:
             for event in pygame.event.get():
                 match event.type:
                     case pygame.QUIT:
-                        window.end()
+                        self.server.window.end()
                         sys.exit()
                     case pygame.KEYDOWN:
                         self.key_pressed[event.key] = True
@@ -86,7 +86,7 @@ class GameSession:
 
             # Contrôle de la Gravité
 
-            window.clock.tick(window.fps)
+            self.server.window.clock.tick(self.server.window.fps)
 
     def gravity_effect(self, resitance = 0):
         print(self.gravity_value - resitance - self.player.resistance)
