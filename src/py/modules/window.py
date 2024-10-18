@@ -1,5 +1,5 @@
 import pygame
-from main import GameClass
+from modules.gameclass import GameClass
 
 class Window(GameClass):
     def __init__(self, config: dict) -> None:

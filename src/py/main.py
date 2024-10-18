@@ -6,19 +6,6 @@ from modules.level_design import Block, LevelBlocks
 import sys
 from json import loads
 
-class GameClass:
-    def __init__(self, config: dict, name: str):
-        self._config = config[name]
-
-    @property
-    def config(self):
-        return self._config
-    
-    @config.setter
-    def setconfig(self, name: str):
-        self._config = self._config[name]
-
-
 class Server:
     def __init__(self):
         self.config: dict = self.save_default_config()
@@ -29,12 +16,11 @@ class Server:
         data = json_file.read()
         return loads(data)
 
-
 class GameSession:
     def __init__(self) -> None:
         self.server = Server()
         self.background = BackGround(self.server.config)
-        self.player = Player("../../ressources/characters/player/")
+        self.player = Player(self.server.config)
         self.level_blocks = LevelBlocks()
         self.key_pressed = {}
         self.gravity_value = 10
@@ -44,9 +30,9 @@ class GameSession:
         while self.window.is_running:
 
             #ScreenUpdater
-            window.set_image(self.background.image, (0, 0))
-            window.set_image(self.player.frame, self.player.rect)
-            self.level_blocks.printed(window.screen)
+            self.server.window.set_image(self.background.image, (0, 0))
+            self.server.window.set_image(self.player.sprite, self.player.rect)
+            self.level_blocks.printed(self.server.window.screen)
             pygame.display.update()
 
             #KeyPress
@@ -70,7 +56,7 @@ class GameSession:
             for event in pygame.event.get():
                 match event.type:
                     case pygame.QUIT:
-                        window.end()
+                        self.server.window.end()
                         sys.exit()
                     case pygame.KEYDOWN:
                         self.key_pressed[event.key] = True
@@ -100,7 +86,7 @@ class GameSession:
 
             # Contrôle de la Gravité
 
-            window.clock.tick(window.fps)
+            self.server.window.clock.tick(self.server.window.fps)
 
     def gravity_effect(self, resitance = 0):
         print(self.gravity_value - resitance - self.player.resistance)
