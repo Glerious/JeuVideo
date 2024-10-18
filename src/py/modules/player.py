@@ -1,7 +1,7 @@
 import pygame
 from functools import wraps
 from modules.player_properties import *
-from main import GameClass
+from modules.gameclass import GameClass
 
 FRAME_FOR_JUMP = 500
 STATIC_SPRITE_TIME = 200

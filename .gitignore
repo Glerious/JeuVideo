@@ -1,2 +1,4 @@
 src/py/test.py
 src/py/modules/player_information.txt
+src/py/modules/__pycache__/
+src/py/__pycache__/

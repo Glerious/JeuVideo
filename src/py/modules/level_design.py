@@ -1,10 +1,17 @@
-import pygame
-from modules.window import HEIGHT, WIDTH
+from gameclass import GameClass
 
-class Ground(pygame.sprite.Sprite):
-    def __init__(self) -> None:
+import pygame
+
+
+class LevelDesign(GameClass):
+    def __init__(self, config: dict):
         super().__init__()
-        self.rect = pygame.Rect(0, HEIGHT - 100, WIDTH, 100)
+
+class Ground(LevelDesign, pygame.sprite.Sprite):
+    def __init__(self, config: dict) -> None:
+        super().__init__(config, "ground")
+        pygame.sprite.Sprite.__init__(self)
+        self.rect = pygame.Rect(0, 10000 - 100, WIDTH, 100)
     
     def printed(self, screen : pygame.Surface):
         pygame.draw.rect(screen, (0, 255, 0), self.rect)
