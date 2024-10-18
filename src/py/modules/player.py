@@ -1,19 +1,21 @@
 import pygame
 from functools import wraps
 from modules.player_properties import *
+from main import GameClass
 
 FRAME_FOR_JUMP = 500
 STATIC_SPRITE_TIME = 200
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self, frame_path: str) -> None:
+class Player(GameClass, pygame.sprite.Sprite):
+    def __init__(self, config: dict) -> None:
+        super(self).__init__(config, "player")
         # Statistic
-        self.healh : int = 100
-        self.max_health : int= 100
-        self.speed : float = 5
-        self.max_height : float = 150
-        self.weight: int = 1
-        self.resistance : int = 0
+        statistics_config = self.config["statistics"]
+        self.max_health: int = statistics_config["health"]
+        self.health: int = self.max_health
+        self.max_speed: int = statistics_config["speed"]
+        self.speed: int = self.max_speed
+        self.mass: int = 65
         # Dynamics informations
         self.dash : bool = True
         # Passiv informations
@@ -24,7 +26,6 @@ class Player(pygame.sprite.Sprite):
         self.is_jumping : bool = False
         self.is_dashing : bool = False
         # Display
-        self.frame_path = frame_path
         self.frame_number = 0
         self.frame = pygame.image.load(self.get_path()).convert_alpha()
         self.rect = self.frame.get_rect()
@@ -47,6 +48,8 @@ class Player(pygame.sprite.Sprite):
         if self.is_static:
             self.frame_number = 0 if self.frame_number == 2 else self.frame_number + 1
 
+
+    #TODO coder un déplacement vectoriel ayant pour norme la vitesse et sa direction ?
     def set_position(self, x : int, y : int) -> None:
         self.rect.x = x
         self.rect.y = y
@@ -76,11 +79,25 @@ class Player(pygame.sprite.Sprite):
     def dash(self):
         return
     
-class StaticAnimation():
-    def __init__(self, player : Player, time : int) -> None:
-        self.player = player
+
+class PlayerAnimation(GameClass):
+    def __init__(self, player: Player, name: str) -> None:
+        super(self).__init__(player.config, name)
+        self._player: Player = player
+
+    @property
+    def player(self):
+        return self._player
+    
+    @player.setter
+    def setplayer(self, player: Player):
+        self._player = player
+    
+class StaticAnimation(PlayerAnimation):
+    def __init__(self, player: Player, time : int) -> None:
+        super(self).__init__(player, "static")
         self.begin = time
-        self.cooldown = STATIC_SPRITE_TIME
+        self.frame = self.player.config["frame"]
 
     def next(self):
         now = pygame.time.get_ticks()

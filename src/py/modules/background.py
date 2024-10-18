@@ -1,10 +1,16 @@
 import pygame
-# TODO Why not working
-# import initializer 
+from main import GameClass
 
-class BackGround:
-    def __init__(self, path : str) -> None:
-        self.image : pygame.Surface = pygame.image.load(path).convert_alpha()
+class BackGround(GameClass):
+    def __init__(self, config : dict) -> None:
+        super(self).__init__(config, "background")
+        self._image : pygame.Surface = self.setimage(self.config["path"] + self.config["init"])
 
-    def setPath(self, path : str):
-        self.image = pygame.image.load(path).convert_alpha()
+    @property
+    def image(self):
+        """Image définie pour le background."""
+        return self._image
+
+    @image.setter
+    def setimage(self, name : str):
+        self.image = pygame.image.load(name).convert_alpha()

@@ -1,7 +1,34 @@
 {
+    "self": {
+        "path" : "../../ressources/config.json"
+    },
     "window" : {
         "name" : "Celeste2Wish",
         "width" : 765,
-        "height" : 1360
+        "height" : 1360,
+        "fps" : 60
+    },
+    "background" : {
+        "path" : "../../ressources/background/",
+        "init" : "init.png"
+    },
+    "player" : {
+        "path" : "../../ressources/characters/player/",
+        "caracteristics" : {
+            "height" : 90,
+            "width" : 60
+        },
+        "statistics" : {
+            "health" : 100,
+            "speed" : 7.5556,
+            "mass" : 70
+        },
+        "static" : {
+            "frame" : 200
+        },
+        "jump" : {
+            "frame" : 100,
+            "height" : 150
+        }
     }
 }

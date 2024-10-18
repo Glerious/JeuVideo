@@ -1,14 +1,13 @@
 import pygame
+from main import GameClass
 
-HEIGHT = 765
-WIDTH = 1360
-
-class Window:
-    def __init__(self, name : str, width : float, height : float, fps : float = 60) -> None:
+class Window(GameClass):
+    def __init__(self, config: dict) -> None:
+        super(self).__init__(config, "window")
         self.is_running : bool = True
-        self.screen : pygame.Surface = self.window_generator(name, width, height)
+        self.screen : pygame.Surface = self.window_generator()
         self.clock = pygame.time.Clock()
-        self.fps = 60
+        self.fps = self.config["fps"]
 
     def start(self):
         self.is_running = True
@@ -17,11 +16,10 @@ class Window:
     def end(self):
         self.is_running = False
         return pygame.quit()
-    
 
-    def window_generator(self, name : str, width : float, height : float) -> pygame.Surface:
-        pygame.display.set_caption(name)
-        return pygame.display.set_mode((width, height))
+    def window_generator(self) -> pygame.Surface:
+        pygame.display.set_caption(self.config["name"])
+        return pygame.display.set_mode((self.config["name"], self.config["height"]))
     
     def set_image(self, image : pygame.Surface, destination):
         self.screen.blit(image, destination)

@@ -6,16 +6,34 @@ from modules.level_design import Block, LevelBlocks
 import sys
 from json import loads
 
-json_data = open("../../ressources/config.json", 'r').read()
-config: list = loads(json_data)
+class GameClass:
+    def __init__(self, config: dict, name: str):
+        self._config = config[name]
 
-window = Window("Nothing", config["window"]["width"], config["window"]["height"])
+    @property
+    def config(self):
+        return self._config
+    
+    @config.setter
+    def setconfig(self, name: str):
+        self._config = self._config[name]
 
-window.start()
+
+class Server:
+    def __init__(self):
+        self.config: dict = self.save_default_config()
+        self.window = Window(self.config)
+
+    def save_default_config():
+        json_file = open("../../ressources/config.json", 'r')
+        data = json_file.read()
+        return loads(data)
+
 
 class GameSession:
     def __init__(self) -> None:
-        self.background = BackGround("../../ressources/background/bg.png")
+        self.server = Server()
+        self.background = BackGround(self.server.config)
         self.player = Player("../../ressources/characters/player/")
         self.level_blocks = LevelBlocks()
         self.key_pressed = {}
@@ -23,7 +41,7 @@ class GameSession:
 
     def running(self):
         
-        while window.is_running:
+        while self.window.is_running:
 
             #ScreenUpdater
             window.set_image(self.background.image, (0, 0))
