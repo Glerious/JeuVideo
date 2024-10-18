@@ -4,11 +4,12 @@ from modules.player import Player
 from modules.level_design import Block, LevelBlocks
 
 import sys
-from json import load
+from json import loads
 
-config = load("../../ressources/config.json")
+json_data = open("../../ressources/config.json", 'r').read()
+config: list = loads(json_data)
 
-window = Window("Nothing", config[], HEIGHT)
+window = Window("Nothing", config["window"]["width"], config["window"]["height"])
 
 window.start()
 
