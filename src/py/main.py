@@ -5,25 +5,21 @@ from modules.level_design import Block, LevelBlocks
 
 import sys
 from json import loads
-
-class Server:
-    def __init__(self):
+    
+class GameSession:
+    def __init__(self) -> None:
         self.config: dict = self.save_default_config()
-        self.window = Window(self.config)
+        self.window: Window = Window(self.config)
+        self.background: BackGround = BackGround(self.config)
+        self.player: Player = Player(self.config)
+        self.level_blocks: LevelBlocks = LevelBlocks()
+        self.key_pressed: dict = {}
+        self.gravity_value: float = 9.81
 
     def save_default_config():
         json_file = open("../../ressources/config.json", 'r')
         data = json_file.read()
         return loads(data)
-
-class GameSession:
-    def __init__(self) -> None:
-        self.server = Server()
-        self.background = BackGround(self.server.config)
-        self.player = Player(self.server.config)
-        self.level_blocks = LevelBlocks()
-        self.key_pressed = {}
-        self.gravity_value = 10
 
     def running(self):
         

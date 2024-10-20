@@ -3,7 +3,7 @@ from modules.gameclass import GameClass
 
 class Window(GameClass):
     def __init__(self, config: dict) -> None:
-        super(self).__init__(config, "window")
+        super().__init__(config, "window")
         self.is_running : bool = True
         self.screen : pygame.Surface = self.window_generator()
         self.clock = pygame.time.Clock()

@@ -8,17 +8,18 @@ STATIC_SPRITE_TIME = 200
 
 class Player(GameClass, pygame.sprite.Sprite):
     def __init__(self, config: dict) -> None:
-        super(self).__init__(config, "player")
+        super().__init__(config, "player")
         statistics_config = self.config["statistics"]
         # Statistic
         self.max_health: int = statistics_config["health"]
         self._health: int = self.max_health
         self.max_speed: int = statistics_config["speed"]
         self._speed: int = self.max_speed
-        self._mass: int = 65
+        self._mass: int = statistics_config["mass"]
         # Dynamic informations
         self.static: Static = Static(self)
         self.jump: Jump = Jump(self)
+        self.move: Move = Move(self)
         self.dash: Dash = Dash(self)
         self.is_left : bool = False
         # Display
@@ -32,17 +33,78 @@ class Player(GameClass, pygame.sprite.Sprite):
 
     def sprite_update(self):
         self.sprite.fill((0, 0, 0, 0))
-        path: str
-        if self.dash.isactive: 
-            path = self.dash.getpath()
-        if self.jump.isactive: 
-            path = self.jump.getpath()
-        else: 
-            path = self.static.getpath()
-            self.static.next()
-        self.sprite = pygame.image.load(path).convert_alpha()
+        states = [self.dash, self.jump, self.move, self.static]
+        for i in states:
+            i: PlayerAnimation
+            if i.isactive:
+                i.next()
+                self.sprite = pygame.image.load(i.getpath()).convert_alpha()
+                return
+    
 
-    #TODO coder un déplacement vectoriel ayant pour norme la vitesse et sa direction ?
+class PlayerAnimation(GameClass):
+    def __init__(self, player: Player, name: str, sprite_number: int) -> None:
+        super().__init__(player.config, name)
+        self._player: Player = player
+        self._active: bool = False
+        self._sprite_number: int = sprite_number
+        self._digit: int = 0
+
+    @property
+    def player(self):
+        return self._player
+
+    @property
+    def isactive(self):
+        return self._active
+    
+    @isactive.setter
+    def switchactive(self):
+        self._active = False if self._active else False
+
+    @property
+    def sprite_number(self):
+        return self._sprite_number
+    
+    @property
+    def digit(self):
+        return self._digit
+    
+    @digit.setter
+    def incr_digit(self):
+        return self._digit + 1
+
+    def next(self) -> int:
+        return 0 if self.digit == (self.sprite_number - 1)  else self.incr_digit()
+
+    def getpath(self) -> str:
+        pass
+    
+class Static(PlayerAnimation):
+    def __init__(self, player: Player) -> None:
+        super().__init__(player, "static", 3)
+        self.switchactive()
+        self.begin: int = pygame.time.get_ticks()
+        self.frame: int = self.config["frame"]
+
+    def next(self):
+        if pygame.time.get_ticks() - self.begin() :
+            return self.digit
+        self.begin = pygame.time.get_ticks()
+        return super().next()
+
+    def getpath(self) -> str:
+        path = self.player.config["path"]
+        path += "left" if self.player.is_left else "right"
+        path += str(self.digit)
+        path += ".png"
+        return path
+
+class Move(PlayerAnimation):
+    def __init__(self, player: Player):
+        super().__init__(player, "move")
+
+        #TODO coder un déplacement vectoriel ayant pour norme la vitesse et sa direction ?
     def move_left(self):
         if self.rect.x <= 0:
             return
@@ -64,53 +126,6 @@ class Player(GameClass, pygame.sprite.Sprite):
         if self.rect.y >= HEIGHT:
             return
         self.rect.y += self.speed
-    
-
-class PlayerAnimation(GameClass):
-    def __init__(self, player: Player, name: str) -> None:
-        super(self).__init__(player.config, name)
-        self._player: Player = player
-        self._active: bool = False
-
-    @property
-    def player(self):
-        return self._player
-    
-    @player.setter
-    def setplayer(self, player: Player):
-        self._player = player
-
-    @property
-    def isactive(self):
-        return self._active
-    
-    @isactive.setter
-    def switchactive(self):
-        self._active = False if self._active else False
-
-    def getpath(self) -> str:
-        pass
-    
-class Static(PlayerAnimation):
-    def __init__(self, player: Player) -> None:
-        super(self).__init__(player, "static")
-        self.switchactive()
-        self.number: int = 0
-        self.begin: int = pygame.time.get_ticks()
-        self.frame: int = self.config["frame"]
-
-    def next(self) -> int:
-        if pygame.time.get_ticks() - self.begin() :
-            return self.number
-        self.begin = pygame.time.get_ticks()
-        return 0 if self.number == 2 else self.number + 1
-
-    def getpath(self) -> str:
-        path = self.player.config["path"]
-        path += "left" if self.player.is_left else "right"
-        path += str(self.number)
-        path += ".png"
-        return path
 
 class Jump(PlayerAnimation):
     def __init__(self, player : Player) -> None:
