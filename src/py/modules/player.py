@@ -23,7 +23,7 @@ class Player(GameClass, pygame.sprite.Sprite):
         self.dash: Dash = Dash(self)
         self.is_left : bool = False
         # Display
-        self.sprite: pygame.Surface = pygame.image.load(self.static.getpath()).convert_alpha()
+        self.sprite: pygame.Surface = pygame.image.load(self.static.get_path()).convert_alpha()
         self.rect = self.sprite.get_rect()
         self.set_position(40, 0)
     
@@ -39,10 +39,9 @@ class Player(GameClass, pygame.sprite.Sprite):
         self.rect.y += vector[1]
                 
     def position_update(self):
-        vector: ndarray = self.move.vector * self.max_speed
-        vector = (1 / norm(self.move.vector)) * vector if norm(self.move.vector) != 0 else vector
-
-        # self.move.active = False if vector == array([0, 0]) else True
+        norme: float = norm(self.move.vector) ** (-1) if norm(self.move.vector) != 0 else 1.0
+        vector: ndarray = norme * self.max_speed * self.move.vector
+        self.move.active = False if (vector == array([0, 0])).all() else True
         self.move.reset_vector()
         self.incr_position(vector)
 
@@ -54,7 +53,7 @@ class Player(GameClass, pygame.sprite.Sprite):
             i: PlayerAnimation
             if i.active:
                 i.next()
-                self.sprite = pygame.image.load(i.getpath()).convert_alpha()
+                self.sprite = pygame.image.load(i.get_path()).convert_alpha()
                 return
 
 class PlayerAnimation(GameClass):
@@ -124,7 +123,7 @@ class Static(PlayerAnimation):
         self.switch_active()
         self.begin_now()
 
-    def getpath(self) -> str:
+    def get_path(self) -> str:
         path = self.player.config["path"] + "static/"
         path += "left" if self.player.is_left else "right"
         path += "_" + str(self.digit)

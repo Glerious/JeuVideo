@@ -27,7 +27,7 @@
             "frame" : 200
         },
         "move" : {
-            "frame" : 100
+            "frame" : 500
         },
         "jump" : {
             "frame" : 100,

@@ -44,6 +44,8 @@ class GameSession:
             for i, j in self.key_values.items():
                 if self.key_pressed.get(i):
                     self.player.move.incr_vector(self.config, j)
+            
+            self.player.is_left = True if self.key_pressed.get(pygame.K_q) else False if self.key_pressed.get(pygame.K_d) else self.player.is_left
 
             # if self.key_pressed.get(pygame.K_SPACE):
             #     self.player.jump.start(pygame.time.get_ticks())
