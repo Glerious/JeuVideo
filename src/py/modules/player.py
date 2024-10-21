@@ -1,10 +1,6 @@
 import pygame
 from functools import wraps
-from modules.player_properties import *
 from modules.gameclass import GameClass
-
-FRAME_FOR_JUMP = 500
-STATIC_SPRITE_TIME = 200
 
 class Player(GameClass, pygame.sprite.Sprite):
     def __init__(self, config: dict) -> None:
@@ -27,19 +23,31 @@ class Player(GameClass, pygame.sprite.Sprite):
         self.rect = self.sprite.get_rect()
         self.set_position(40, 0)
     
-    def set_position(self, x : int, y : int) -> None:
+    def get_position(self) -> tuple[int, int]:
+        return (self.rect.x, self.rect.y)
+    
+    def set_position(self, x: int, y: int) -> None:
         self.rect.x = x
         self.rect.y = y
+
+    def incr_position(self, vector: tuple) -> None:
+        self.rect.x += vector[0]
+        self.rect.y += vector[1]
+                
+    def position_update(self):
+        vector: tuple = self.move.vector
+        self.incr_position(vector)
 
     def sprite_update(self):
         self.sprite.fill((0, 0, 0, 0))
         states = [self.dash, self.jump, self.move, self.static]
         for i in states:
             i: PlayerAnimation
-            if i.isactive:
+            if i.is_active:
                 i.next()
                 self.sprite = pygame.image.load(i.getpath()).convert_alpha()
                 return
+
     
 
 class PlayerAnimation(GameClass):
@@ -49,17 +57,19 @@ class PlayerAnimation(GameClass):
         self._active: bool = False
         self._sprite_number: int = sprite_number
         self._digit: int = 0
+        self._frame: int = self.config["frame"]
+        self._begin: int
 
     @property
     def player(self):
         return self._player
 
     @property
-    def isactive(self):
+    def is_active(self):
         return self._active
     
-    @isactive.setter
-    def switchactive(self):
+    @is_active.setter
+    def switch_active(self):
         self._active = False if self._active else False
 
     @property
@@ -73,8 +83,23 @@ class PlayerAnimation(GameClass):
     @digit.setter
     def incr_digit(self):
         return self._digit + 1
+    
+    @property
+    def frame(self):
+        return self._frame
+    
+    @property
+    def begin(self):
+        return self._begin
+    
+    @begin.setter
+    def set_begin(self):
+        self._begin = pygame.time.get_ticks()
 
     def next(self) -> int:
+        if pygame.time.get_ticks() - self.begin < self._frame:
+            return self.digit
+        self.set_begin
         return 0 if self.digit == (self.sprite_number - 1)  else self.incr_digit()
 
     def getpath(self) -> str:
@@ -83,15 +108,8 @@ class PlayerAnimation(GameClass):
 class Static(PlayerAnimation):
     def __init__(self, player: Player) -> None:
         super().__init__(player, "static", 3)
-        self.switchactive()
-        self.begin: int = pygame.time.get_ticks()
-        self.frame: int = self.config["frame"]
-
-    def next(self):
-        if pygame.time.get_ticks() - self.begin() :
-            return self.digit
-        self.begin = pygame.time.get_ticks()
-        return super().next()
+        self.switch_active()
+        self.set_begin
 
     def getpath(self) -> str:
         path = self.player.config["path"]
@@ -103,29 +121,19 @@ class Static(PlayerAnimation):
 class Move(PlayerAnimation):
     def __init__(self, player: Player):
         super().__init__(player, "move")
+        self._vector: tuple = (0, 0)
 
-        #TODO coder un déplacement vectoriel ayant pour norme la vitesse et sa direction ?
-    def move_left(self):
-        if self.rect.x <= 0:
-            return
-        self.is_left = True
-        self.rect.x -= self.speed
-
-    def move_right(self):
-        if self.rect.x >= WIDTH:
-            return
-        self.is_left = False
-        self.rect.x += self.speed
-
-    def move_above(self):
-        if self.rect.y <= 0:
-            return
-        self.rect.y -= self.speed
+    @property
+    def vector(self):
+        return self._vector
     
-    def move_below(self):
-        if self.rect.y >= HEIGHT:
-            return
-        self.rect.y += self.speed
+    @vector.setter
+    def incr_vector(self, config: dict, name: str):
+        self._vector += self.get_vector(config, name)
+
+    def get_vector(self, config: dict, name: str) -> tuple[int, int]:
+         direction = config["constant"][name]
+         return (direction["x"], direction["y"])
 
 class Jump(PlayerAnimation):
     def __init__(self, player : Player) -> None:
