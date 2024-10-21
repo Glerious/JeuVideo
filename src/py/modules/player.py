@@ -1,6 +1,7 @@
 from modules.gameclass import GameClass
 
 from numpy import array, ndarray
+from numpy.linalg import norm
 from functools import wraps
 import pygame
 
@@ -39,6 +40,9 @@ class Player(GameClass, pygame.sprite.Sprite):
                 
     def position_update(self):
         vector: ndarray = self.move.vector * self.max_speed
+        vector = (1 / norm(self.move.vector)) * vector if norm(self.move.vector) != 0 else vector
+
+        # self.move.active = False if vector == array([0, 0]) else True
         self.move.reset_vector()
         self.incr_position(vector)
 
@@ -52,8 +56,6 @@ class Player(GameClass, pygame.sprite.Sprite):
                 i.next()
                 self.sprite = pygame.image.load(i.getpath()).convert_alpha()
                 return
-
-    
 
 class PlayerAnimation(GameClass):
     def __init__(self, player: Player, name: str, sprite_number: int) -> None:
@@ -72,6 +74,10 @@ class PlayerAnimation(GameClass):
     @property
     def active(self):
         return self._active
+    
+    @active.setter
+    def active(self, value: bool):
+        self._active = value
     
     def switch_active(self):
         self._active = False if self._active else True
@@ -109,9 +115,9 @@ class PlayerAnimation(GameClass):
         self.begin_now()
         self.digit = 0 if self.digit == (self.sprite_number - 1)  else self.digit + 1
 
-    def getpath(self) -> str:
+    def get_path(self) -> str:
         pass
-    
+
 class Static(PlayerAnimation):
     def __init__(self, player: Player) -> None:
         super().__init__(player, "static", 3)
@@ -119,7 +125,7 @@ class Static(PlayerAnimation):
         self.begin_now()
 
     def getpath(self) -> str:
-        path = self.player.config["path"]
+        path = self.player.config["path"] + "static/"
         path += "left" if self.player.is_left else "right"
         path += "_" + str(self.digit)
         path += ".png"
@@ -138,11 +144,18 @@ class Move(PlayerAnimation):
         self._vector = array([0, 0])
     
     def incr_vector(self, config: dict, name: str):
-        self._vector += self.get_vector(config, name)
+        self._vector += self.get_absolute_vector(config, name)
 
-    def get_vector(self, config: dict, name: str) -> ndarray:
+    def get_absolute_vector(self, config: dict, name: str) -> ndarray:
         direction = config["constant"][name]
         return array([direction["x"], direction["y"]])
+    
+    def get_path(self) -> str:
+        path = self.player.config["path"] + "move/"
+        path += "left" if self.player.is_left else "right"
+        path += "_" + str(self.digit)
+        path += ".png"
+        return path
 
 class Jump(PlayerAnimation):
     def __init__(self, player : Player) -> None:

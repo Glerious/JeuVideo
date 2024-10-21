@@ -44,7 +44,6 @@ class GameSession:
             for i, j in self.key_values.items():
                 if self.key_pressed.get(i):
                     self.player.move.incr_vector(self.config, j)
-                    print(self.player.move.vector)
 
             # if self.key_pressed.get(pygame.K_SPACE):
             #     self.player.jump.start(pygame.time.get_ticks())
@@ -56,7 +55,6 @@ class GameSession:
             # blocks_collided = pygame.sprite.spritecollide(self.player, self.level_blocks.all_blocks, False)
 
             # if len(blocks_collided) > 0:
-            #     print("yes")
             #     if self.key_pressed.get(pygame.K_z):
             #         self.player.rect.top = blocks_collided[0].rect.bottom + 10
             #     elif self.key_pressed.get(pygame.K_s):

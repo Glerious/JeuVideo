@@ -1,0 +1,12 @@
+Le joueur est personnage de 1.80 m et de 70 kg.
+On a donc : 1.80 m = 90 px
+
+On sait que 1 s = 60 frames et 1 m = 50 px.
+On veut que le joueur fasse de bout en bout horizontal en 3 secondes.
+Soit une vitesse de 7.555555... px / frames. On prendre 8 px / frames
+
+Pour le calcule d'une chute, nous prendrons une apporche physique :
+Soit l'energie mecanique d'un système dite constantes :
+Em = Ec + Epp = m*g*h + 0.5*m*v**2 = m*(g*h + 0.5*v**2) = k
+Donc: g*h + 0.5*v**2 = k/m
+Et: v = sqrt(2 * (k/m - g*h))
