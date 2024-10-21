@@ -12,7 +12,7 @@ class GameSession:
         self.window: Window = Window(self.config)
         self.background: BackGround = BackGround(self.config)
         self.player: Player = Player(self.config)
-        self.level_blocks: LevelBlocks = LevelBlocks()
+        # self.level_blocks: LevelBlocks = LevelBlocks()
         self.key_pressed: dict = {}
         self.key_values = {
                 pygame.K_d : "right",
@@ -28,13 +28,12 @@ class GameSession:
         return loads(data)
 
     def running(self):
-        
         while self.window.is_running:
             # EventHandler
             for event in pygame.event.get():
                 match event.type:
                     case pygame.QUIT:
-                        self.server.window.end()
+                        self.window.end()
                         sys.exit()
                     case pygame.KEYDOWN:
                         self.key_pressed[event.key] = True
@@ -45,6 +44,7 @@ class GameSession:
             for i, j in self.key_values.items():
                 if self.key_pressed.get(i):
                     self.player.move.incr_vector(self.config, j)
+                    print(self.player.move.vector)
 
             # if self.key_pressed.get(pygame.K_SPACE):
             #     self.player.jump.start(pygame.time.get_ticks())
@@ -71,7 +71,7 @@ class GameSession:
             #ScreenUpdater
             self.window.set_image(self.background.image, (0, 0))
             self.window.set_image(self.player.sprite, self.player.rect)
-            self.level_blocks.printed(self.window.screen)
+            # self.level_blocks.printed(self.window.screen)
             pygame.display.update()
 
             self.window.clock.tick(self.window.fps)
@@ -82,4 +82,3 @@ class GameSession:
 
 session = GameSession()
 session.running()
-

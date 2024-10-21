@@ -1,6 +1,9 @@
-import pygame
-from functools import wraps
 from modules.gameclass import GameClass
+
+from numpy import array, ndarray
+from functools import wraps
+import pygame
+
 
 class Player(GameClass, pygame.sprite.Sprite):
     def __init__(self, config: dict) -> None:
@@ -30,20 +33,22 @@ class Player(GameClass, pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-    def incr_position(self, vector: tuple) -> None:
+    def incr_position(self, vector: ndarray) -> None:
         self.rect.x += vector[0]
         self.rect.y += vector[1]
                 
     def position_update(self):
-        vector: tuple = self.move.vector
+        vector: ndarray = self.move.vector * self.max_speed
+        self.move.reset_vector()
         self.incr_position(vector)
 
     def sprite_update(self):
         self.sprite.fill((0, 0, 0, 0))
+        self.position_update()
         states = [self.dash, self.jump, self.move, self.static]
         for i in states:
             i: PlayerAnimation
-            if i.is_active:
+            if i.active:
                 i.next()
                 self.sprite = pygame.image.load(i.getpath()).convert_alpha()
                 return
@@ -58,19 +63,18 @@ class PlayerAnimation(GameClass):
         self._sprite_number: int = sprite_number
         self._digit: int = 0
         self._frame: int = self.config["frame"]
-        self._begin: int
+        self._begin: int = 0
 
     @property
     def player(self):
         return self._player
 
     @property
-    def is_active(self):
+    def active(self):
         return self._active
     
-    @is_active.setter
     def switch_active(self):
-        self._active = False if self._active else False
+        self._active = False if self._active else True
 
     @property
     def sprite_number(self):
@@ -81,8 +85,8 @@ class PlayerAnimation(GameClass):
         return self._digit
     
     @digit.setter
-    def incr_digit(self):
-        return self._digit + 1
+    def digit(self, digit: int):
+        self._digit = digit
     
     @property
     def frame(self):
@@ -93,14 +97,17 @@ class PlayerAnimation(GameClass):
         return self._begin
     
     @begin.setter
-    def set_begin(self):
+    def begin(self, time: int):
+        self._begin = time
+    
+    def begin_now(self):
         self._begin = pygame.time.get_ticks()
 
     def next(self) -> int:
-        if pygame.time.get_ticks() - self.begin < self._frame:
+        if pygame.time.get_ticks() - self._begin < self._frame:
             return self.digit
-        self.set_begin
-        return 0 if self.digit == (self.sprite_number - 1)  else self.incr_digit()
+        self.begin_now()
+        self.digit = 0 if self.digit == (self.sprite_number - 1)  else self.digit + 1
 
     def getpath(self) -> str:
         pass
@@ -109,39 +116,38 @@ class Static(PlayerAnimation):
     def __init__(self, player: Player) -> None:
         super().__init__(player, "static", 3)
         self.switch_active()
-        self.set_begin
+        self.begin_now()
 
     def getpath(self) -> str:
         path = self.player.config["path"]
         path += "left" if self.player.is_left else "right"
-        path += str(self.digit)
+        path += "_" + str(self.digit)
         path += ".png"
         return path
 
 class Move(PlayerAnimation):
     def __init__(self, player: Player):
-        super().__init__(player, "move")
-        self._vector: tuple = (0, 0)
+        super().__init__(player, "move", 2)
+        self._vector: ndarray = array([0, 0])
 
     @property
     def vector(self):
         return self._vector
     
-    @vector.setter
+    def reset_vector(self):
+        self._vector = array([0, 0])
+    
     def incr_vector(self, config: dict, name: str):
         self._vector += self.get_vector(config, name)
 
-    def get_vector(self, config: dict, name: str) -> tuple[int, int]:
-         direction = config["constant"][name]
-         return (direction["x"], direction["y"])
+    def get_vector(self, config: dict, name: str) -> ndarray:
+        direction = config["constant"][name]
+        return array([direction["x"], direction["y"]])
 
 class Jump(PlayerAnimation):
     def __init__(self, player : Player) -> None:
-        super(self).__init__(player, "jump")
-        self.player = player
-        self.begin : int
+        super().__init__(player, "jump", 1)
         self.function = lambda x : (self.player.max_height / (self.frame_number / 2 ) ** 2) * x ** 2 - self.player.max_height
-        self.frame_number : int = 500
         self.last_elevation : int = 0
 
     def start(self, time : int):
@@ -172,4 +178,4 @@ class Jump(PlayerAnimation):
 
 class Dash(PlayerAnimation):
     def __init__(self, player : Player):
-        super().__init__(player, "dash")
+        super().__init__(player, "dash", 1)

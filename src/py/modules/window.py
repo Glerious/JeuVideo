@@ -19,7 +19,7 @@ class Window(GameClass):
 
     def window_generator(self) -> pygame.Surface:
         pygame.display.set_caption(self.config["name"])
-        return pygame.display.set_mode((self.config["name"], self.config["height"]))
+        return pygame.display.set_mode((self.config["height"], self.config["width"]))
     
     def set_image(self, image : pygame.Surface, destination):
         self.screen.blit(image, destination)
