@@ -20,18 +20,39 @@
         },
         "statistics" : {
             "health" : 100,
-            "speed" : 7.5556,
+            "speed" : 7,
             "mass" : 70
         },
         "static" : {
             "frame" : 200
+        },
+        "move" : {
+            "frame" : 500
         },
         "jump" : {
             "frame" : 100,
             "height" : 150
         },
         "dash" : {
-            
+            "frame" : 100
+        }
+    },
+    "constant" : {
+        "right" :{
+            "x" : 1,
+            "y" : 0
+        },
+        "left" : {
+            "x" : -1,
+            "y" : 0
+        },
+        "above" :{
+            "x" : 0,
+            "y" : -1
+        },
+        "under" :{
+            "x" : 0,
+            "y" : 1
         }
     }
 }

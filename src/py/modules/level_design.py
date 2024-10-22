@@ -1,4 +1,4 @@
-from gameclass import GameClass
+from modules.gameclass import GameClass
 
 import pygame
 
