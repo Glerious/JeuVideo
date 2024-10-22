@@ -2,3 +2,5 @@ src/py/test.py
 src/py/modules/player_information.txt
 src/py/modules/__pycache__/
 src/py/__pycache__/
+ressources/player/base_display.pdn
+ressources/player/player_information.txt
