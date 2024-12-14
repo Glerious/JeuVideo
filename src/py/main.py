@@ -1,84 +1,68 @@
 from modules.window import *
 from modules.background import BackGround
-from modules.player import Player
-from modules.level_design import Block, LevelBlocks
+# from modules.level_design import Block, LevelBlocks
+from modules.entity import Player
+from modules.configurable import global_config
+from modules.frame_clock import frame_clock
+from modules.constant import key_pressed
 
+from pygame.event import get
+from pygame.sprite import spritecollide, collide_rect
+from pygame.display import update
+
+import pygame
 import sys
-from json import loads
-    
+
+ 
 class GameSession:
     def __init__(self) -> None:
-        self.config: dict = self.save_default_config()
-        self.window: Window = Window(self.config)
-        self.background: BackGround = BackGround(self.config)
-        self.player: Player = Player(self.config)
-        # self.level_blocks: LevelBlocks = LevelBlocks()
-        self.key_pressed: dict = {}
-        self.key_values = {
-                pygame.K_d : "right",
-                pygame.K_q : "left",
-                pygame.K_z : "above",
-                pygame.K_s : "under"
-            }
-        self.gravity_value: float = 9.81
-
-    def save_default_config(self):
-        json_file = open("../../ressources/config.json", 'r')
-        data = json_file.read()
-        return loads(data)
+        self.window: Window = Window()
+        self.background: BackGround = BackGround()
+        self.player: Player = Player()
+        # self.level_blocks: LevelBlocks = LevelBlocks(global_config.config, self.window.screen)
 
     def running(self):
-        while self.window.is_running:
-            # EventHandler
-            for event in pygame.event.get():
-                match event.type:
-                    case pygame.QUIT:
-                        self.window.end()
-                        sys.exit()
-                    case pygame.KEYDOWN:
-                        self.key_pressed[event.key] = True
-                    case pygame.KEYUP:
-                        self.key_pressed.pop(event.key)
+        # EventHandlder
+        for event in get():
+            match event.type:
+                case pygame.QUIT:
+                    self.window.end()
+                    sys.exit()
+                case pygame.KEYDOWN:
+                    key_pressed.add(event.key)
+                case pygame.KEYUP:
+                    key_pressed.remove(event.key)
 
-            #KeyPress
-            for i, j in self.key_values.items():
-                if self.key_pressed.get(i):
-                    self.player.move.incr_vector(self.config, j)
-            
-            self.player.is_left = True if self.key_pressed.get(pygame.K_q) else False if self.key_pressed.get(pygame.K_d) else self.player.is_left
+        # ScreenUpdater
+        self.background.update(self.window)
+        self.player.update(self.window)
+        # self.level_blocks.printed()
 
-            # if self.key_pressed.get(pygame.K_SPACE):
-            #     self.player.jump.start(pygame.time.get_ticks())
-            # if self.key_pressed.get(pygame.K_LSHIFT):
-            #     self.player.dash()
+        self.player.is_left = True if pygame.K_q in key_pressed else False if pygame.K_d in key_pressed else self.player.is_left
 
-            # Contrôle des sols et des murs
+        self.player.update_preceding()
 
-            # blocks_collided = pygame.sprite.spritecollide(self.player, self.level_blocks.all_blocks, False)
+        # Colision
+        update()
 
-            # if len(blocks_collided) > 0:
-            #     if self.key_pressed.get(pygame.K_z):
-            #         self.player.rect.top = blocks_collided[0].rect.bottom + 10
-            #     elif self.key_pressed.get(pygame.K_s):
-            #         self.player.rect.bottom = blocks_collided[0].rect.top - 10
-            #     if self.key_pressed.get(pygame.K_q):
-            #         self.player.rect.left = self.player.rect.right - 1
-            #     elif self.key_pressed.get(pygame.K_d):
-            #         self.player.rect.right = self.player.rect.left + 1
+        # if not self.player.dash.active:
 
-            self.player.sprite_update()
+        # if self.key_pressed.get(pygame.K_SPACE):
+        #     self.player.jump.start()
+        # if self.key_pressed.get(pygame.K_LSHIFT):
+        #     self.player.dash.start()
 
-            #ScreenUpdater
-            self.window.set_image(self.background.image, (0, 0))
-            self.window.set_image(self.player.sprite, self.player.rect)
-            # self.level_blocks.printed(self.window.screen)
-            pygame.display.update()
+        # Contrôle des sols et des murs
+        # _blocks_collided = spritecollide(self.player.sprite, self.level_blocks.all_blocks, False, collide_rect)
+        # self.player.interactive = _blocks_collided
+        # self.player.sprite_update()
 
-            self.window.clock.tick(self.window.fps)
 
-    # def gravity_effect(self, resitance = 0):
-    #     print(self.gravity_value - resitance - self.player.resistance)
-    #     self.player.rect.y += self.gravity_value - resitance - self.player.resistance
+        
+        frame_clock.update()
+        self.window.clock.tick(self.window.fps)
 
-session = GameSession()
-session.running()
+if __name__ == "__main__":
+    session = GameSession()
+    while session.window.is_running:
+        session.running()
