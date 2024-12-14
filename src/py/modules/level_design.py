@@ -1,41 +1,69 @@
-from modules.gameclass import GameClass
-
+from modules.configurable import global_config, Configurable
 import pygame
 
+class LevelStructures(Configurable):
+    def __init__(self, config_: dict, name_: str, screen_: pygame.Surface):
+        super().__init__(config_, name_)
+        self.__screen: pygame.Surface = screen_
+        self.__color: tuple = (0, 255, 0)
+        self._rect: pygame.Rect
 
-class LevelDesign(GameClass):
-    def __init__(self, config: dict):
-        super().__init__()
+    @property
+    def rect(self):
+        return self._rect
+    @rect.setter
+    def rect(self, rect_: pygame.Rect):
+        self._rect = rect_
+        
+    def set_transparent(self):
+        self.__color = (0, 0, 0)
 
-class Ground(LevelDesign, pygame.sprite.Sprite):
-    def __init__(self, config: dict) -> None:
-        super().__init__(config, "ground")
+    def set_colored(self):
+        self.__color = (0, 255, 0)
+
+    def printed(self):
+        pygame.draw.rect(self.__screen, self.__color, self.rect)
+
+class Ground(LevelStructures, pygame.sprite.Sprite):
+    def __init__(self, config_: dict, screen_: pygame.Surface) -> None:
+        super().__init__(config_, "ground", screen_)
         pygame.sprite.Sprite.__init__(self)
-        self.rect = pygame.Rect(0, 10000 - 100, WIDTH, 100)
+        self.__size = self.config["size"]
+        self.rect = pygame.Rect(0, global_config.window["height"] - self.__size, global_config.window["width"], self.__size)
+
     
-    def printed(self, screen : pygame.Surface):
-        pygame.draw.rect(screen, (0, 255, 0), self.rect)
-
-class Block(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height) -> None:
-        super().__init__()
-        self.rect = pygame.Rect(x, y, width, height)
-        self.color = (0, 255, 0)
+class Block(LevelStructures, pygame.sprite.Sprite):
+    def __init__(self, config_: dict, screen_: pygame.Surface, x_: int, y_: float, width_: int, height_: int) -> None:
+        super().__init__(config_, "block", screen_)
+        pygame.sprite.Sprite.__init__(self)
         self.resistance = 10
+        self.rect = pygame.Rect(x_, y_, width_, height_)
 
-    def printed(self, screen: pygame.Surface):
-        pygame.draw.rect(screen, self.color, self.rect)
+class LevelBlocks(Configurable):
+    def __init__(self, config_: dict, screen_: pygame.Surface) -> None:
+        super().__init__(config_, "level_design")
+        self._all_blocks: pygame.sprite.Group = pygame.sprite.Group()
+        self._all_blocks.add(Block(self.config, screen_, 0, 612, 170, global_config.window["height"] - 612))
+        self._all_blocks.add(Block(self.config, screen_, 170, 714, 170, global_config.window["height"] - 714))
+        self._all_blocks.add(Block(self.config, screen_, 340, 544, 120, global_config.window["height"] - 544))
+        self._all_blocks.add(Block(self.config, screen_, 460, 646, 152, global_config.window["height"] - 646))
+        self._all_blocks.add(Block(self.config, screen_, 300, 100, 100, 100))
+        # self._all_blocks.add(Block(self.config, 460, 670 - 12, 220, global_config.window["window"]["height"] - 670 + 12, screen_))
+        self._ground: Ground = Ground(self.config, screen_)
+
+    @property
+    def all_blocks(self):
+        return self._all_blocks
+    @property
+    def ground(self):
+        return self._ground
+
+    def printed(self):
+        self.ground.printed()
+        for _block in self.all_blocks:
+            _block : Block
+            _block.printed()
 
 
-class LevelBlocks():
-    def __init__(self) -> None:
-        self.all_blocks = pygame.sprite.Group()
-        self.all_blocks.add(Block(0, 612 - 12, 170, HEIGHT - 612 + 12))
-        self.all_blocks.add(Block(170, 714 - 12, 170, HEIGHT - 714 + 12))
-        self.all_blocks.add(Block(340, 544 - 12, 120, HEIGHT - 544 + 12))
-        self.all_blocks.add(Block(460, 670 - 12, 220, HEIGHT - 670 + 12))
-
-    def printed(self, screen: pygame.Surface):
-        for block in self.all_blocks:
-            block : Block
-            block.printed(screen)
+if __name__ == "__main__":
+    pass

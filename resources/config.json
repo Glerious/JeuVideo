@@ -1,0 +1,78 @@
+{
+    "self": {
+        "path" : "../../resources/config.json"
+    },
+    "window" : {
+        "name" : "Celeste2Wish",
+        "height" : 765,
+        "width" : 1360,
+        "fps" : 60,
+        "speed_frame" : 0.06
+    },
+    "background" : {
+        "path" : "../../resources/background/",
+        "init" : "init.png"
+    },
+    "entity" : {
+        "player" : {
+            "path" : "../../resources/player/",
+            "health" : 100,
+            "speed" : 7,
+            "mass" : 70,
+            "size" : {
+                "height" : 90,
+                "width" : 60
+            }
+        }
+    },
+    "action": {
+        "static" : {
+            "duration" : 0,
+            "cooldown" : 0,
+            "animation" : {
+                "delay" : 10,
+                "sprite" : 3,
+                "roll" : true
+            }
+        },
+        "move" : {
+            "duration" : 1,
+            "cooldown": 0,
+            "animation" : {
+                "delay" : 15,
+                "sprite" : 2,
+                "roll" : true
+            }
+        },
+        "jump" : {
+            "duration" : 60,
+            "cooldown": 0,
+            "animation" : {
+                "delay" : 60,
+                "sprite" : 1,
+                "roll" : false
+            },
+            "height" : 20
+        },
+        "dash" : {
+            "duration" : 15,
+            "cooldown" : 60,
+            "animation" : {
+                "delay" : 5,
+                "sprite" : 1,
+                "roll" : true
+            },
+            "length" : 200
+        }
+    },
+    "level_design" : {
+        "ground" : {
+            "size" : 20
+        },
+        "block": {
+
+        }
+    },
+    "constant" : {
+    }
+}
