@@ -2,6 +2,13 @@
     "self": {
         "path" : "../../resources/config.json"
     },
+    "window2" : {
+        "name" : "Celeste2Wish",
+        "height" : 300,
+        "width" : 500,
+        "fps" : 1,
+        "speed_frame" : 0.06
+    },
     "window" : {
         "name" : "Celeste2Wish",
         "height" : 765,
@@ -74,5 +81,8 @@
         }
     },
     "constant" : {
+    },
+    "test" : {
+        "block" : "../../resources/test/block.png"
     }
 }

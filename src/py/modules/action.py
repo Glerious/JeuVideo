@@ -37,7 +37,7 @@ class Static(Action):
         super().__init__(path_ + "static.png", "static")
         self.enable()
 
-class Move(Action):
+class Movement(Action):
     def __init__(self, path_: str) -> None:
         super().__init__(path_ + "move.png", "move")
 
@@ -64,35 +64,37 @@ class Jump(Action):
     def __init__(self, path_: str) -> None:
         super().__init__(path_ + "jump.png", "jump")
         self.maximum_height: int = self.config["height"]
-        self.base_height: int = 0
+        # Son initialisation prend de l'importance à l'enable du jump.
+        self.base_height: int = 0 
+        # C'est une variable qui change en fonction de la hauteur précédente.
         self.last_height: int = 0
 
-    def enable(self, movable_: Movable):
+    def enable(self, position_: Vector2):
         super().enable()
-        self.base_height = movable_.position.x
+        self.base_height = position_.y
+        print(f"{self.base_height = }")
         self.last_height = 0
 
-    def do(self, movable_: Movable) -> Vector2:
+    def do(self, position_: Vector2, calibration_: Vector2) -> Vector2:
+        self.base_height += calibration_.y
         _vector = Vector2()
         if self.is_enable():
-            _vector += self.__increase_vector(movable_)
-            # print(_vector)
-        for i in key_pressed:
-            if i == pygame.K_SPACE:
-                self.enable(movable_)
+            _vector = self.__increase_vector(position_)
+        else:
+            for i in key_pressed:
+                if i == pygame.K_SPACE:
+                    self.enable(position_)
         return _vector
 
-    def __increase_vector(self, movable_: Movable):
+    def __increase_vector(self, position_: Vector2):
         if not self.animation.cooldown.in_delay():
             self.disable()
-            _correction = movable_.rect.y - self.base_height
-            return Vector2(0, -_correction)
-        # print(self.animation.cooldown.time_elapsed())
-
+            _correction = self.base_height - position_.y
+            print(f"{position_.y = }")
+            print(f"{_correction = }")
+            return Vector2(0, _correction)
         _height: float = self.func(self.animation.cooldown.time_elapsed())
-        # print(_height)
         _vector: int = round(_height - self.last_height)
-        print(_vector)
         self.last_height = _height
         return Vector2(0, _vector)
     
@@ -101,9 +103,6 @@ class Jump(Action):
         _a = _b/(0.5*self.duration)**2
         _calibred_frame: int = frame_ - 0.5*self.duration
         return _a*(_calibred_frame)**2 - _b
-        
-    def base_height_calibration(self, vector_: Vector2):
-        self.base_height += vector_.x
 
 class Dash(Action):
     def __init__(self, path_: str):

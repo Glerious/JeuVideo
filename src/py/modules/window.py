@@ -20,7 +20,8 @@ class Window():
 
     def window_generator(self) -> Surface:
         set_caption(global_config.window["name"])
-        return set_mode((global_config.window["width"], global_config.window["height"]))
+        return set_mode((global_config.window["width"], 
+                         global_config.window["height"]))
     
     def set_image(self, image_: Surface, destination_: Vector2):
         self.screen.blit(image_, destination_)

@@ -7,11 +7,13 @@ class GlobalConfig:
     def __init__(self):
         self.__path: str = "../../resources/config.json"
         self.__config: dict = self.__save_default_config()
-        self.background: dict = self.__config["background"]
-        self.constant: dict = self.__config["constant"]
-        self.window: dict = self.__config["window"]
-        self.entity: dict = self.__config["entity"]
-        self.action: dict = self.__config["action"]
+        self.background: dict = self.get()["background"]
+        self.constant: dict = self.get()["constant"]
+        self.window: dict = self.get()["window"]
+        self.entity: dict = self.get()["entity"]
+        self.action: dict = self.get()["action"]
+        self.test: dict = self.get()["test"]
+
     def get(self):
         return self.__config
 

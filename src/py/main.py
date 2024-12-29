@@ -6,9 +6,7 @@ from modules.configurable import global_config
 from modules.frame_clock import frame_clock
 from modules.constant import key_pressed
 
-from pygame.event import get
-from pygame.sprite import spritecollide, collide_rect
-from pygame.display import update
+from pygame import event, display, sprite
 
 import pygame
 import sys
@@ -23,42 +21,42 @@ class GameSession:
 
     def running(self):
         # EventHandlder
-        for event in get():
-            match event.type:
+        for events in event.get():
+            match events.type:
                 case pygame.QUIT:
                     self.window.end()
                     sys.exit()
                 case pygame.KEYDOWN:
-                    key_pressed.add(event.key)
+                    key_pressed.add(events.key)
                 case pygame.KEYUP:
-                    key_pressed.remove(event.key)
+                    key_pressed.remove(events.key)
 
-        # ScreenUpdater
+        # Display
         self.background.update(self.window)
         self.player.update(self.window)
         # self.level_blocks.printed()
 
+        # Physics
         self.player.is_left = True if pygame.K_q in key_pressed else False if pygame.K_d in key_pressed else self.player.is_left
-
-        self.player.update_preceding()
+        self.player.move()
+        print(self.player.position)
 
         # Colision
-        update()
+
 
         # if not self.player.dash.active:
-
-        # if self.key_pressed.get(pygame.K_SPACE):
-        #     self.player.jump.start()
-        # if self.key_pressed.get(pygame.K_LSHIFT):
-        #     self.player.dash.start()
+        #     if self.key_pressed.get(pygame.K_SPACE):
+        #         self.player.jump.start()
+        #     if self.key_pressed.get(pygame.K_LSHIFT):
+        #         self.player.dash.start()
 
         # Contrôle des sols et des murs
-        # _blocks_collided = spritecollide(self.player.sprite, self.level_blocks.all_blocks, False, collide_rect)
+        # _blocks_collided = sprite.spritecollide(self.player.sprite, self.level_blocks.all_blocks, False, sprite.collide_rect)
         # self.player.interactive = _blocks_collided
         # self.player.sprite_update()
 
+        display.update()
 
-        
         frame_clock.update()
         self.window.clock.tick(self.window.fps)
 
