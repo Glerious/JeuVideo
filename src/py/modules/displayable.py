@@ -25,16 +25,12 @@ class Displayable(Sprite):
     def update(self, window_: Window):
         window_.set_image(self.texture, self.position)
 
-    def set_transparent(self):
-        self.opacity = 0
-        self.texture.set_alpha(self.opacity)
-
-    def set_visible(self):
-        self.opacity = 255
+    def set_visible(self, arg_: bool):
+        self.opacity = 255 if arg_ else 0
         self.texture.set_alpha(self.opacity)
 
     def get_visibility(self) -> int:
-        return self.opacity
+        return False if self.opacity == 0 else True
     
 class Movable(Displayable):
     def __init__(self, surface_, coordinates_):

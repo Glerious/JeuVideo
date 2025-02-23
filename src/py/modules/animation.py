@@ -16,7 +16,7 @@ class Animation(Configurable):
         super().__init__(config_, "animation")
         self.sprite_sheet: list = []
         self.active_sprite: Vector2 = Vector2()
-        self.cooldown: Cooldown = Cooldown(self.config["delay"])
+        self.cooldown: Cooldown = Cooldown(self.config["duration"])
     
     def split_sprite_sheet(self, path_: str) -> list[list[Surface]]:
         _sprite_sheet = load(path_)
@@ -31,7 +31,7 @@ class Animation(Configurable):
     def next(self):
         if self.cooldown.in_delay():
             return
-        _x = 0 if self.active_sprite.x == (len(self.sprite_sheet) - 1) and self.config["roll"] else self.active_sprite.x + 1
+        _x = 0 if self.active_sprite.x == (len(self.sprite_sheet) - 1) else self.active_sprite.x + 1
         self.active_sprite = Vector2(_x, self.active_sprite.y)
         self.cooldown.start()
 

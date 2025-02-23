@@ -19,6 +19,7 @@ class GameSession:
         self.player: Player = Player()
         # self.level_blocks: LevelBlocks = LevelBlocks(global_config.config, self.window.screen)
 
+    
     def running(self):
         # EventHandlder
         for events in event.get():
@@ -30,6 +31,10 @@ class GameSession:
                     key_pressed.add(events.key)
                 case pygame.KEYUP:
                     key_pressed.remove(events.key)
+        
+        if pygame.K_o in key_pressed:
+            print(self.player.position)
+            print(f"[{self.player.rect.x}, {self.player.rect.y}]")
 
         # Display
         self.background.update(self.window)
@@ -37,12 +42,9 @@ class GameSession:
         # self.level_blocks.printed()
 
         # Physics
-        self.player.is_left = True if pygame.K_q in key_pressed else False if pygame.K_d in key_pressed else self.player.is_left
         self.player.move()
-        print(self.player.position)
 
         # Colision
-
 
         # if not self.player.dash.active:
         #     if self.key_pressed.get(pygame.K_SPACE):

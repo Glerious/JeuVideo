@@ -37,39 +37,35 @@
             "duration" : 0,
             "cooldown" : 0,
             "animation" : {
-                "delay" : 10,
-                "sprite" : 3,
-                "roll" : true
+                "duration" : 10,
+                "sprite" : 3
             }
         },
         "move" : {
             "duration" : 1,
             "cooldown": 0,
             "animation" : {
-                "delay" : 15,
-                "sprite" : 2,
-                "roll" : true
+                "duration" : 15,
+                "sprite" : 2
             }
         },
         "jump" : {
-            "duration" : 60,
+            "duration" : 30,
             "cooldown": 0,
             "animation" : {
-                "delay" : 60,
-                "sprite" : 1,
-                "roll" : false
+                "duration" : 30,
+                "sprite" : 1
             },
             "height" : 20
         },
         "dash" : {
-            "duration" : 15,
+            "duration" : 10,
             "cooldown" : 60,
             "animation" : {
-                "delay" : 5,
-                "sprite" : 1,
-                "roll" : true
+                "duration" : 10,
+                "sprite" : 1
             },
-            "length" : 200
+            "length" : 50
         }
     },
     "level_design" : {

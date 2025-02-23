@@ -27,7 +27,7 @@ class Configurable:
     Cet héritage est utilisé pour les classes configurable dans un modèle d'arborescence.
     """
     def __init__(self, config_: dict, name_: str):
-        self.__name = name_
-        self.config = config_[self.__name]
+        self.name = name_
+        self.config = config_[self.name]
     
 global_config: GlobalConfig = GlobalConfig()

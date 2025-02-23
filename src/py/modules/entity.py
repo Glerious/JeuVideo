@@ -1,8 +1,10 @@
 from modules.displayable import Movable
-from modules.action import Static, Movement, Jump, Action
+from modules.action import Action, Static, Dynamic, Jump, Dash
 from modules.configurable import global_config, Configurable
+from modules.constant import key_pressed
 
 from pygame import Vector2, Surface
+import pygame
 
 class Entity(Movable, Configurable):
     def __init__(self, surface_: Surface, coordinates_: Vector2, name_: str):
@@ -18,9 +20,9 @@ class Player(Entity):
     def __init__(self):
         path_ = "../../resources/player/"
         self.static: Static = Static(path_)
-        self.movement: Movement = Movement(path_)
+        self.movement: Dynamic = Dynamic(path_)
         self.jump: Jump = Jump(path_)
-        # self.dash: Dash = Dash(path_)
+        self.dash: Dash = Dash(path_)
         # self.grab: Grab = Grab(path_)
         super().__init__(
             self.static.animation.get_sprite(),
@@ -29,25 +31,23 @@ class Player(Entity):
         )
 
     def update(self, window_):
+        self.is_left = True if pygame.K_q in key_pressed else False if pygame.K_d in key_pressed else self.is_left
         self.update_sprite()
         super().update(window_)
 
     def move(self):
-        # if self.dash.is_enable():
-        #     _vector = self.dash.do()
-        #     return
         _vector: Vector2 = self.movement.do()
-        # _vector += self.jump.do(self.position, _vector)
-        self.position = _vector
+        _direction: Vector2 = _vector
+        _vector += self.jump.do(self.position, _vector)
+        _vector = self.dash.do(_direction, _vector)
+        if self.dash.is_enable():
+            print(_vector) 
         super().move(_vector*self.speed)
 
     def update_sprite(self):
-        #TODO faire la gestion des .active dans les classes move, dash, jump, grab, static
         _states = [
-            # self.dash, 
-            self.jump, 
-            self.movement, 
-            self.static#, 
+            self.dash,
+              self.jump, self.movement, self.static#, 
             # self.grab
             ]
         for i in _states:
