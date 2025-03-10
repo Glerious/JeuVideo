@@ -1,5 +1,4 @@
 from modules.window import Window
-from modules.level_design import Block
 
 from pygame import Vector2, Surface, Rect
 from pygame.sprite import Sprite
@@ -41,18 +40,15 @@ class Movable(Displayable):
         self.last_vector = vector_
         self.rect.move_ip(vector_.x, vector_.y)
 
-    # def colliding(self, blocks_colliding_: list) -> Vector2:
-    #TODO Modifier cette fonction pour la faire fonctionner avec la physique du rect.
+    def colliding(self, blocks_colliding_: list):
     #TODO Corriger le bugs de collision
-    #     _corrector = Vector2()
-    #     for _block in blocks_colliding_:
-    #         _block: Block
-    #         if self.last_vector[0] > 0:
-    #             _corrector[0] = _block.rect.left - self.rect.right
-    #         elif self.last_vector[0] < 0:
-    #             _corrector[0] = _block.rect.right - self.rect.left
-    #         if self.last_vector[1] > 0:
-    #             _corrector[1] = _block.rect.top - self.rect.bottom
-    #         elif self.last_vector[1] < 0:
-    #             _corrector[1] = _block.rect.bottom - self.rect.top
-    #     return _corrector 
+        for _block in blocks_colliding_:
+            _block: Rect = _block.rect
+            if self.rect.right > _block.left and self.rect.left < _block.left:
+                self.rect.right = _block.left
+            elif self.rect.left < _block.right and self.rect.right > _block.right:
+                self.rect.left = _block.right
+            elif self.rect.top < _block.bottom and self.rect.bottom > _block.bottom:
+                self.rect.top = _block.bottom
+            elif self.rect.bottom > _block.top and self.rect.top < _block.top:
+                self.rect.bottom = _block.top

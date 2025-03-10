@@ -1,6 +1,6 @@
 from modules.window import *
 from modules.background import BackGround
-# from modules.level_design import Block, LevelBlocks
+from modules.level_design import Block, LevelBlocks
 from modules.entity import Player
 from modules.configurable import global_config
 from modules.frame_clock import frame_clock
@@ -17,7 +17,7 @@ class GameSession:
         self.window: Window = Window()
         self.background: BackGround = BackGround()
         self.player: Player = Player()
-        # self.level_blocks: LevelBlocks = LevelBlocks(global_config.config, self.window.screen)
+        self.level_blocks: LevelBlocks = LevelBlocks(self.window.screen)
 
     
     def running(self):
@@ -39,10 +39,12 @@ class GameSession:
         # Display
         self.background.update(self.window)
         self.player.update(self.window)
-        # self.level_blocks.printed()
+        self.level_blocks.printed()
 
         # Physics
-        self.player.move()
+        _blocks_collided = pygame.sprite.spritecollide(self.player, self.level_blocks.all_blocks, False, pygame.sprite.collide_rect)
+        self.player.move(_blocks_collided)
+
 
         # Colision
 

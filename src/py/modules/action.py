@@ -1,4 +1,3 @@
-from modules.displayable import Movable
 from modules.animation import Animation, Cooldown
 from modules.configurable import global_config, Configurable
 from modules.constant import key_pressed
@@ -106,30 +105,19 @@ class Dash(Action):
         self.step_vector: Vector2 = Vector2()
 
     def enable(self, direction_: Vector2):
+        super().enable()
         _step_length: int = self.maximum_length/self.duration.delay
         self.step_vector = direction_*_step_length
-        return super().enable()
     
-    def disable(self):
-        self.cooldown.start()
-        return super().disable()
-
     def do(self, direction_: Vector2, vector_: Vector2) -> Vector2:
-        if pygame.K_LSHIFT in key_pressed and not self.cooldown.in_delay() and not self.is_enable():
+        if pygame.K_LSHIFT in key_pressed:
             self.enable(direction_)
-            vector_ = self.step_vector
         if self.is_enable():
-            if not self.duration.in_delay():
-                self.disable()
-            else:
+            if self.duration.in_delay():
                 vector_ = self.step_vector
+            else:
+                self.disable()
         return vector_
-
-    # def norm(self) -> Vector2:
-    #     if frame_clock.get() - self.begin > self.frame:
-    #         self.stop()
-    #         return 1
-    #     return self.maximum_length/(self.frame*global_config.window["speed_frame"])
 
 class Grab(Action):
     def __init__(self, path_):

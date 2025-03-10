@@ -35,19 +35,18 @@ class Player(Entity):
         self.update_sprite()
         super().update(window_)
 
-    def move(self):
+    def move(self, blocks_colliding_: list):
         _vector: Vector2 = self.movement.do()
         _direction: Vector2 = _vector
         _vector += self.jump.do(self.position, _vector)
         _vector = self.dash.do(_direction, _vector)
-        if self.dash.is_enable():
-            print(_vector) 
+        if len(blocks_colliding_) != 0:
+            _vector = Vector2()
+            self.colliding(blocks_colliding_)
         super().move(_vector*self.speed)
 
     def update_sprite(self):
-        _states = [
-            self.dash,
-              self.jump, self.movement, self.static#, 
+        _states = [self.dash, self.jump, self.movement, self.static#, 
             # self.grab
             ]
         for i in _states:
